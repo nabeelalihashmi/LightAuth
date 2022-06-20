@@ -1,0 +1,21 @@
+{
+    "name": "nabeelalihashmi/lightauth",
+    "description": "Lightweight auth library for PHP",
+    "type": "library",
+    "require": {
+        "firebase/php-jwt": "^6.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "IconicCodes\\LightAuth\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Nabeel Ali",
+            "email": "mail2nabeelali@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
