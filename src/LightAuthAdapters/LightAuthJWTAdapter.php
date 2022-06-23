@@ -2,12 +2,12 @@
 
 namespace IconicCodes\LightAuth\LightAuthAdapters;
 
-use Firebase\JWT\JWT;
 use IconicCodes\LightAuth\LightAuthBase;
 use IconicCodes\LightAuth\LightAuthAdapters\ILightAuthAdapter;
 
 class LightAuthJWTAdapter extends LightAuthBase implements ILightAuthAdapter {
     
+    public static $JWT_OBJ;
     public static $jwt_secret_key = "highly_secret_key";
     public static $jwt_issuer = "https://localhost:8081/";
     public static $jwt_nbf_delay = 10;
@@ -24,7 +24,7 @@ class LightAuthJWTAdapter extends LightAuthBase implements ILightAuthAdapter {
                 "iat" => time(),
                 "exp" => time() + (60 * 60 * 24 * 7)
             ];
-            $token = JWT::encode($data, self::$jwt_secret_key, "HS256");
+            $token = self::$JWT_OBJ::encode($data, self::$jwt_secret_key, "HS256");
             return $token;
         }
         return false;   
@@ -33,7 +33,7 @@ class LightAuthJWTAdapter extends LightAuthBase implements ILightAuthAdapter {
     public static function getLoggedInUser() {
         $token = self::getToken();
         if ($token) {
-            $decoded = JWT::decode($token, self::$jwt_secret_key, array("HS256"));
+            $decoded = self::$JWT_OBJ::decode($token, self::$jwt_secret_key, array("HS256"));
             $user = $decoded->user;
             return $user;
         }
@@ -43,7 +43,7 @@ class LightAuthJWTAdapter extends LightAuthBase implements ILightAuthAdapter {
     public static function isUserLoggedIn() {
         $token = self::getToken();
         if ($token) {
-            $decoded = JWT::decode($token, self::$jwt_secret_key, array("HS256"));
+            $decoded = self::$JWT_OBJ::decode($token, self::$jwt_secret_key, array("HS256"));
             $user = $decoded->user;
             if ($user) {
                 return true;
@@ -55,12 +55,14 @@ class LightAuthJWTAdapter extends LightAuthBase implements ILightAuthAdapter {
     }
 
 
-    function getToken() {
+    private static function getToken() {
         if (isset($_COOKIE[self::$jwt_cookie_key])) {
             return $_COOKIE[self::$jwt_cookie_key];
         } else if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
             return $_SERVER['HTTP_AUTHORIZATION'];
-        }
+        } 
+
+        return null;
     }
 
     public static function logoutUser() {
